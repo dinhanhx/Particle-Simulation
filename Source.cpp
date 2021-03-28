@@ -41,6 +41,27 @@ void limitEyePosition() {
 
 Cube cube = Cube(edgeLength);
 
+// Eye's control and config
+float vertical = 0.0f;
+float horizontal = 0.0f;
+float deltaHorizontal = 0.0f;
+float deltaVertical = 0.0f;
+float lx = cos(horizontal) * cos(vertical);
+float ly = sin(vertical);
+float lz = sin(horizontal) * cos(vertical);
+
+void computeHorizontal(float deltaAngle) {
+	horizontal += deltaAngle;
+	lx = cos(horizontal) * cos(vertical);
+	lz = sin(horizontal) * cos(vertical);
+}
+
+void computeVertical(float deltaAngle) {
+	vertical += deltaAngle;
+	ly = sin(vertical);
+}
+
+// This func is a para of glutDisplayFunc, glutIdleFunc
 void renderScene() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -71,14 +92,29 @@ void renderScene() {
 		Eye["lookAtX"] = get<0>(ps.getPosition());
 		Eye["lookAtY"] = get<1>(ps.getPosition());
 		Eye["lookAtZ"] = get<2>(ps.getPosition());
+
+		gluLookAt(Eye["posX"], Eye["posY"], Eye["posZ"],
+			Eye["lookAtX"], Eye["lookAtY"], Eye["lookAtZ"],
+			Eye["upX"], Eye["upY"], Eye["upZ"]);
+	}
+	else {
+		if (deltaHorizontal) {
+			computeHorizontal(deltaHorizontal);
+		}
+		if (deltaVertical) {
+			computeVertical(deltaVertical);
+		}
+
+		gluLookAt(Eye["posX"], Eye["posY"], Eye["posZ"],
+			Eye["posX"] + lx, Eye["posY"] + ly, Eye["posZ"] + lz,
+			Eye["upX"], Eye["upY"], Eye["upZ"]);
 	}
 	
-	gluLookAt(Eye["posX"], Eye["posY"], Eye["posZ"],
-		Eye["lookAtX"], Eye["lookAtY"], Eye["lookAtZ"],
-		Eye["upX"], Eye["upY"], Eye["upZ"]);
+	
 
 }
 
+// This func is a para of glutReshapeFunc()
 void reshapeScene(int width, int height) {
 	glMatrixMode(GL_PROJECTION);
 	glViewport(0, 0, width, height);
@@ -97,9 +133,9 @@ void keyboard(unsigned char key, int x_mouse_pos, int y_mouse_pos) {
 		EyeFollowParticle = !EyeFollowParticle;
 		if (!EyeFollowParticle) {
 			// This will make the eye look at 0, 0, 0 corner
-			Eye["lookAtX"] = 0.0f;
-			Eye["lookAtY"] = 0.0f;
-			Eye["lookAtZ"] = 0.0f;
+			gluLookAt(Eye["posX"], Eye["posY"], Eye["posZ"],
+				0.0f, 0.0f, 0.0f,
+				Eye["upX"], Eye["upY"], Eye["upZ"]);
 		}
 		break;
 	default:
@@ -107,6 +143,47 @@ void keyboard(unsigned char key, int x_mouse_pos, int y_mouse_pos) {
 	}
 }
 
+// This func is a para of glutKeyboardSpecialFunc()
+void pressKey(int key, int mouseX, int mouseY) {
+	switch (key)
+	{
+	case GLUT_KEY_UP:
+		deltaVertical = 0.001f;
+		break;
+	case GLUT_KEY_DOWN:
+		deltaVertical = -0.001f;
+		break;
+	case GLUT_KEY_LEFT:
+		deltaHorizontal = -0.001f;
+		break;
+	case GLUT_KEY_RIGHT:
+		deltaHorizontal = 0.001f;
+		break;
+	default:
+		break;
+	}
+}
+
+// This func is a para of glutKeyboardSpecialUpFunc()
+void releaseKey(int key, int mouseX, int mouseY) {
+	switch (key)
+	{
+	case GLUT_KEY_UP:
+		deltaVertical = 0.0f;
+		break;
+	case GLUT_KEY_DOWN:
+		deltaVertical = 0.0f;
+		break;
+	case GLUT_KEY_LEFT:
+		deltaHorizontal = 0.0f;
+		break;
+	case GLUT_KEY_RIGHT:
+		deltaHorizontal = 0.0f;
+		break;
+	default:
+		break;
+	}
+}
 
 int main(int argc, char **argv) {
 	glutInit(&argc, argv);
@@ -134,6 +211,8 @@ int main(int argc, char **argv) {
 
 	// Pass functions to handle keyboard events
 	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(pressKey);
+	glutSpecialUpFunc(releaseKey);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);
