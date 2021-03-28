@@ -14,6 +14,10 @@ map<string, GLfloat> Eye = {
 };
 bool EyeFollowParticle = false; 
 
+// Light configuration
+GLfloat lightSource[] = {5.0f, 5.0f, 5.0f, 1.0f}; //position
+GLfloat light[] = {0.0f, 1.0f, 0.0f, 1.0f}; // color
+
 // Create a sphere
 Particle ps = Particle(make_tuple(2.5f, 2.5f, 2.5f),
 	make_tuple(224, 17, 95), 0.1f, 1);
@@ -39,6 +43,18 @@ Cube cube = Cube(edgeLength);
 
 void renderScene() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Light
+	glClearDepth(1.0f); // set depth clear
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0); // single light source
+	glLightfv(GL_LIGHT0, GL_POSITION, lightSource); // init light source
+	//glLightfv(GL_LIGHT0, GL_AMBIENT, light);
+	//glMaterialfv(GL_FRONT, GL_DIFFUSE, light);
+	glEnable(GL_COLOR_MATERIAL); // enable material color tracking
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE); // set it
+	glEnable(GL_BLEND); // enable blending
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // set it
 	
 	// Put functions to draw and to move objects here
 	cube.draw();
