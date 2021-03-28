@@ -29,7 +29,7 @@ public:
 		// Assign random velocity for x, y, z
 		srand(static_cast <unsigned> (time(0)));
 		float LO = 0.000f;
-		float HI = 0.010f;
+		float HI = 0.005f;
 		float x_vec = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
 		float y_vec = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
 		float z_vec = LO + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (HI - LO)));
