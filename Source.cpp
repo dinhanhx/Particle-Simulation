@@ -4,6 +4,7 @@
 #include<tuple>
 #include"Particle.h"
 #include"Cube.h"
+#include"WaterParticle.h"
 using namespace std;
 
 // Initialize the Eye
@@ -12,15 +13,16 @@ map<string, GLfloat> Eye = {
 	{"lookAtX", 0.0f}, {"lookAtY", 0.0f}, {"lookAtZ", 0.0f},
 	{"upX", 0.0f}, {"upY", 1.0f}, {"upZ", 0.0f}
 };
-bool EyeFollowParticle = false; 
+bool EyeFollowParticle = true; 
 
 // Light configuration
 GLfloat lightSource[] = {5.0f, 5.0f, 5.0f, 1.0f}; //position
 GLfloat light[] = {0.0f, 1.0f, 0.0f, 1.0f}; // color
 
-// Create a sphere
-Particle ps = Particle(make_tuple(2.5f, 2.5f, 2.5f),
-	make_tuple(224, 17, 95), 0.1f, 1);
+// Create a water particle
+WaterParticle wp0 = WaterParticle(make_tuple(2.5f, 2.5f, 2.5f), 0);
+WaterParticle wp1 = WaterParticle(make_tuple(3.5f, 3.5f, 3.5f), 1);
+WaterParticle wp2 = WaterParticle(make_tuple(4.5f, 4.5f, 4.5f), 2);
 
 // Cube's edge length, boundaries of Eye's positions
 GLfloat edgeLength = 10.0f;
@@ -79,8 +81,14 @@ void renderScene() {
 	
 	// Put functions to draw and to move objects here
 	cube.draw();
-	ps.draw();
-	ps.move(lowerBoundary, upperBoundary);
+	wp0.draw();
+	wp0.move(lowerBoundary, upperBoundary);
+
+	wp1.draw();
+	wp1.move(lowerBoundary, upperBoundary);
+
+	wp2.draw();
+	wp2.move(lowerBoundary, upperBoundary);
 
 	glutSwapBuffers();
 	glLoadIdentity();
@@ -89,9 +97,9 @@ void renderScene() {
 
 	if (EyeFollowParticle) {
 		// This will make the eye follow the sphere
-		Eye["lookAtX"] = get<0>(ps.getPosition());
-		Eye["lookAtY"] = get<1>(ps.getPosition());
-		Eye["lookAtZ"] = get<2>(ps.getPosition());
+		Eye["lookAtX"] = get<0>(wp0.getPosition());
+		Eye["lookAtY"] = get<1>(wp0.getPosition());
+		Eye["lookAtZ"] = get<2>(wp0.getPosition());
 
 		gluLookAt(Eye["posX"], Eye["posY"], Eye["posZ"],
 			Eye["lookAtX"], Eye["lookAtY"], Eye["lookAtZ"],
@@ -216,9 +224,6 @@ int main(int argc, char **argv) {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);
-
-	// Load texture
-	ps.loadCustomBmp("metal.bmp");
 
 	glutMainLoop();
 	return 0;

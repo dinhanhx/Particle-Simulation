@@ -1,4 +1,4 @@
-#pragma 
+#pragma once
 #pragma warning(disable : 4996)
 #include <tuple>
 #include <GL/glut.h>
@@ -36,11 +36,17 @@ public:
 		velocity = make_tuple(x_vec, y_vec, z_vec);
 	}
 
+	Particle () {}
+
 	// Get functions
 	tuple <float, float, float> getPosition() { return position; }
 	tuple <unsigned short, unsigned short, unsigned short> getColor() { return color; }
 	float getRadius() { return radius; }
 	int getId() { return id; }
+
+	// Set functions
+	void setPosition(tuple <float, float, float> position) { this->position = position; }
+	void setVelocity(tuple <float, float, float> velocity) { this->velocity = velocity; }
 
 	// Draw a solid sphere
 	void draw()
