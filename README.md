@@ -30,3 +30,11 @@ Compile and/or run
 g++ ...
 ```
 
+## Instruction
+
+Press `f` key to lock/unlock the eye. By default, the eye locks on first water particle.
+
+When the eye unlocks, you can use `up, down, left, right` to rotate the eye around.
+
+Press `esc` to exit the program.
+
